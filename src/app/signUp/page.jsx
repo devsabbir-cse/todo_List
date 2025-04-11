@@ -17,8 +17,32 @@ const SignUpPage = () => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  const validateEmail = (email) => {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
+  };
+
+  const validatePassword = (password) => {
+    const minLength = password.length >= 6;
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasLowerCase = /[a-z]/.test(password);
+    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+  
+    return minLength && hasUpperCase && hasLowerCase && hasSpecialChar;
+  };
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!validateEmail(form.gmail)) {
+      setMessage("Invalid email format.");
+      return;
+    }
+
+    if (!validatePassword(form.password)) {
+      setMessage("Password must be at least 6 characters and include uppercase, lowercase, and a special character.");
+      return;
+    }
+
     setMessage("Submitting...");
 
     try {
@@ -42,18 +66,17 @@ const SignUpPage = () => {
           router.push("/signIn");
         }, 1500);
       } else {
-        setMessage(result.message || "Something went wrong");
+        setMessage("Something went wrong");
       }
     } catch (err) {
-      console.error("Fetch error:", err);
-      setMessage("Error submitting form. Please try again.");
+      setMessage("Try Another Gmail");
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-200 to-blue-500 text-black px-4">
       <div className="w-full max-w-md bg-white rounded-3xl shadow-2xl p-10">
-      <h1 className="text-3xl font-extrabold text-center text-blue-600 mb-6">
+        <h1 className="text-3xl font-extrabold text-center text-blue-600 mb-6">
           📝 To-Do List
         </h1>
 
@@ -96,7 +119,7 @@ const SignUpPage = () => {
           </button>
 
           {message && (
-            <p className="mt-4 text-center text-sm text-gray-600">{message}</p>
+            <p className="mt-4 text-center text-sm text-red-600">{message}</p>
           )}
         </form>
 
